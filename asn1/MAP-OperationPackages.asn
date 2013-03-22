@@ -129,8 +129,35 @@ FROM MAP-LocationServiceOperations {
    itu-t identified-organization (4) etsi (0) mobileDomain (0)
    gsm-Network (1) modules (3) map-LocationServiceOperations (24)
    version12 (12)}
+   processUnstructuredSS-Data
+FROM SS-Operations {
+   itu-t identified-organization (4) etsi (0) mobileDomain (0) gsm-Access (2) modules (3)
+   ss-Operations (0) version10 (10)}
+
 
 ;
+
+-- dummies
+
+updateVcsgLocation OPERATION ::= {
+   ARGUMENT
+      SendIdentificationArg
+   RESULT
+      SendIdentificationRes
+   ERRORS {
+      dataMissing |
+      unidentifiedSubscriber}
+   CODE  local:5500 }
+
+cancelVcsgLocation OPERATION ::= {
+   ARGUMENT
+      SendIdentificationArg
+   RESULT
+      SendIdentificationRes
+   ERRORS {
+      dataMissing |
+      unidentifiedSubscriber}
+   CODE  local:5501 }
 
 
 locationUpdatingPackage-v3  OPERATION-PACKAGE ::= {
@@ -221,6 +248,12 @@ subscriberDataMngtStandAlonePackage-v3  OPERATION-PACKAGE ::= {
 		insertSubscriberData |
 		deleteSubscriberData} }
 
+equipmentMngtPackage-v2  OPERATION-PACKAGE ::= {
+	-- Supplier is EIR if Consumer is MSC
+	-- Supplier is EIR if Consumer is SGSN
+	CONSUMER INVOKES {
+		checkIMEI} }
+
 equipmentMngtPackage-v3  OPERATION-PACKAGE ::= {
 	-- Supplier is EIR if Consumer is MSC
 	-- Supplier is EIR if Consumer is SGSN
@@ -233,6 +266,11 @@ subscriberDataMngtPackage-v3  OPERATION-PACKAGE ::= {
 		insertSubscriberData} }
 
 resetPackage-v2  OPERATION-PACKAGE ::= {
+	-- Supplier is VLR or SGSN if Consumer is HLR
+	CONSUMER INVOKES {
+		reset} }
+
+resetPackage-v3  OPERATION-PACKAGE ::= {
 	-- Supplier is VLR or SGSN if Consumer is HLR
 	CONSUMER INVOKES {
 		reset} }
@@ -255,16 +293,29 @@ functionalSsPackage-v2  OPERATION-PACKAGE ::= {
 	SUPPLIER INVOKES {
 		getPassword} }
 
+functionalSsPackage-v1  OPERATION-PACKAGE ::= {
+	-- Supplier is HLR if Consumer is VLR
+	CONSUMER INVOKES {
+		registerSS |
+		eraseSS |
+		activateSS |
+		deactivateSS |
+		registerPassword |
+		interrogateSS}
+	SUPPLIER INVOKES {
+		getPassword} }
+
 tracingPackage-v3  OPERATION-PACKAGE ::= {
 	-- Supplier is VLR or SGSN if Consumer is HLR
 	CONSUMER INVOKES {
 		activateTraceMode} }
 
--- bindingPackage-v1  OPERATION-PACKAGE ::= {
+bindingPackage-v1  OPERATION-PACKAGE ::= {
 	-- Supplier is HLR if Consumer is VLR
 	-- Supplier is gsmSCF if Consumer is HLR
---	CONSUMER INVOKES {
+	CONSUMER INVOKES {
 --		beginSubscriberActivity} }
+		activateTraceMode} }
 
 unstructuredSsPackage-v2  OPERATION-PACKAGE ::= {
 	-- Supplier is HLR if Consumer is VLR
@@ -274,11 +325,12 @@ unstructuredSsPackage-v2  OPERATION-PACKAGE ::= {
 	SUPPLIER INVOKES {
 		unstructuredSS-Request |
 		unstructuredSS-Notify} }
--- unstructuredSsPackage-v1  OPERATION-PACKAGE ::= {
+
+ unstructuredSsPackage-v1  OPERATION-PACKAGE ::= {
 	-- Supplier is HLR if Consumer is VLR
 	-- Supplier is gsmSCF if Consumer is HLR
---	CONSUMER INVOKES {
---		processUnstructuredSS-Data} }
+	CONSUMER INVOKES {
+		processUnstructuredSS-Data} }
 
 mo-ShortMsgRelayPackage-v3  OPERATION-PACKAGE ::= {
 	-- Supplier is IWMSC if Consumer is MSC
@@ -498,5 +550,17 @@ mt-ShortMsgRelay-VGCS-Package-v3  OPERATION-PACKAGE ::= {
 	CONSUMER INVOKES {
 		mt-ForwardSM-VGCS} }
 -- This package is v3 only.
+
+vcsgLocationUpdatingPackage-v3 OPERATION-PACKAGE ::= {
+   -- Supplier is CSS if Consumer is VLR or SGSN
+   CONSUMER INVOKES {
+      updateVcsgLocation} }
+-- This operation package is v3 only
+
+vcsgLocationCancellationPackage-v3 OPERATION-PACKAGE ::= {
+   -- Supplier is VLR or SGSN if Consumer is CSS
+   CONSUMER INVOKES {
+      cancelVcsgLocation} }
+-- This operation package is v3 only
 
 END

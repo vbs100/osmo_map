@@ -1,7 +1,5 @@
--- $Id: MAP-ApplicationContexts.asn 32509 2010-04-19 05:58:01Z etxrab $
---17.3.3	ASN.1 Module for application-context-names
---The following ASN.1 module summarises the application-context-name assigned to MAP application-contexts.
--- 3GPP TS 29.002 V9.1.0 (2010-03)
+-- The following ASN.1 module defines MAP application-contexts.
+-- 3GPP TS 29.002 V11.5.0 (2013-01)
 MAP-ApplicationContexts {
    itu-t identified-organization (4) etsi (0) mobileDomain (0)
    gsm-Network (1) modules (3) map-ApplicationContexts (2) version11 (11)}
@@ -17,180 +15,403 @@ BEGIN
 
 
 IMPORTS
-	gsm-NetworkId,
-	ac-Id
-FROM MobileDomainDefinitions {
-   itu-t (0) identified-organization (4) etsi (0) mobileDomain (0)
-   mobileDomainDefinitions (0) version1 (1)}
+   gsm-NetworkId,
+   ac-Id
+      FROM MobileDomainDefinitions {
+         itu-t (0) identified-organization (4) etsi (0) mobileDomain (0)
+         mobileDomainDefinitions (0) version1 (1)}
+   locationUpdatingPackage-v3,
+   dataRestorationPackage-v3,
+   subscriberDataMngtPackage-v3,
+   tracingPackage-v3,
+   locationCancellationPackage-v3,
+   roamingNumberEnquiryPackage-v3,
+   interrogationPackage-v3,
+   callControlTransferPackage-v4,
+   resetPackage-v3,
+   handoverControlPackage-v3,
+   imsiRetrievalPackage-v2,
+   equipmentMngtPackage-v3,
+   equipmentMngtPackage-v2,
+   infoRetrievalPackage-v3,
+   infoRetrievalPackage-v2,
+   interVlrInfoRetrievalPackage-v3,
+   interVlrInfoRetrievalPackage-v2,
+   subscriberDataMngtStandAlonePackage-v3,
+   tracingStandAlonePackage-v3,
+   functionalSsPackage-v2,
+   functionalSsPackage-v1,
+   unstructuredSsPackage-v1,
+   bindingPackage-v1,
+   unstructuredSsPackage-v2,
+   shortMsgGatewayPackage-v3,
+   mo-ShortMsgRelayPackage-v3,
+   alertingPackage-v2,
+   mwdMngtPackage-v3,
+   mt-ShortMsgRelayPackage-v3,
+   purgingPackage-v3,
+   subscriberInformationEnquiryPackage-v3,
+   anyTimeInformationEnquiryPackage-v3,
+   groupCallControlPackage-v3,
+   groupCallInfoRetrievalPackage-v3,
+   gprsLocationUpdatingPackage-v3,
+   subscriberDataMngtPackage-v3,
+   tracingPackage-v3,
+   gprsInterrogationPackage-v4,
+   failureReportingPackage-v3,
+   gprsNotifyingPackage-v3,
+   ss-InvocationNotificationPackage-v3,
+   setReportingStatePackage-v3,
+   statusReportPackage-v3,
+   remoteUserFreePackage-v3,
+   setReportingStatePackage-v3,
+   statusReportPackage-v3,
+   callCompletionPackage-v3,
+   locationSvcGatewayPackage-v3,
+   locationSvcEnquiryPackage-v3,
+   locationSvcReportingPackage-v3,
+   ist-AlertingPackage-v3,
+   serviceTerminationPackage-v3,
+   mm-EventReportingPackage-v3,
+   anyTimeInformationHandlingPackage-v3,
+   subscriberDataModificationNotificationPackage-v3,
+   authenticationFailureReportPackage-v3,
+   resourceManagementPackage-v3,
+   mt-ShortMsgRelay-VGCS-Package-v3,
+   vcsgLocationUpdatingPackage-v3,
+   subscriberDataMngtPackage-v3,
+   vcsgLocationCancellationPackage-v3
+FROM MAP-OperationPackages {
+   itu-t identified-organization (4) etsi (0) mobileDomain (0)
+   gsm-Network (1) modules (3) map-OperationPackages (1)
+   version12 (12)}
 ;
 
--- application-context-names
 
 map-ac  OBJECT IDENTIFIER ::= {gsm-NetworkId ac-Id}
 
-networkLocUpContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac networkLocUp(1) version3(3)}
+networkLocUpContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is VLR
+    INITIATOR CONSUMER OF {
+    locationUpdatingPackage-v3 |
+    dataRestorationPackage-v3}
+    RESPONDER CONSUMER OF {
+    subscriberDataMngtPackage-v3 |
+    tracingPackage-v3}
+ ID {map-ac networkLocUp(1) version3(3)} }
 
-locationCancellationContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac locationCancel(2) version3(3)}
+locationCancellationContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VLR or SGSN if Initiator is HLR
+    INITIATOR CONSUMER OF {
+    locationCancellationPackage-v3}
+ ID {map-ac locationCancel(2) version3(3)} }
 
-roamingNumberEnquiryContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac roamingNbEnquiry(3) version3(3)}
+roamingNumberEnquiryContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VLR if Initiator is HLR
+    INITIATOR CONSUMER OF {
+    roamingNumberEnquiryPackage-v3}
+ ID {map-ac roamingNbEnquiry(3) version3(3)} }
 
-authenticationFailureReportContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac authenticationFailureReport(39) version3(3)}
+locationInfoRetrievalContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR or NPLR if Initiator is GMSC
+    -- Responder is HLR if Initiator is gsmSCF
+    INITIATOR CONSUMER OF {
+    interrogationPackage-v3}
+ ID {map-ac locInfoRetrieval(5) version3(3)} }
 
-locationInfoRetrievalContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac locInfoRetrieval(5) version3(3)}
+callControlTransferContext-v4 APPLICATION-CONTEXT ::= {
+    -- Responder is GMSC if Initiator is VMSC
+    INITIATOR CONSUMER OF {
+    callControlTransferPackage-v4}
+ ID {map-ac callControlTransfer(6) version4(4)} }
 
-resetContext-v2  OBJECT IDENTIFIER ::=
-	{map-ac reset(10) version2(2)}
+resetContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VLR or SGSN if Initiator is HLR or CSS
+    INITIATOR CONSUMER OF {
+    resetPackage-v3}
+ ID {map-ac reset(10) version3(3)} }
 
-handoverControlContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac handoverControl(11) version3(3)}
+handoverControlContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is MSCB if Initiator is MSCA
+    INITIATOR CONSUMER OF {
+    handoverControlPackage-v3}
+ ID {map-ac handoverControl(11) version3(3)} }
 
-equipmentMngtContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac equipmentMngt(13) version3(3)}
+imsiRetrievalContext-v2 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is VLR
+    INITIATOR CONSUMER OF {
+    imsiRetrievalPackage-v2}
+ ID {map-ac imsiRetrieval(26) version2(2)} }
 
-infoRetrievalContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac infoRetrieval(14) version3(3)}
+equipmentMngtContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is EIR if Initiator is MSC
+    -- Responder is EIR if Initiator is SGSN
+    INITIATOR CONSUMER OF {
+    equipmentMngtPackage-v3}
+ ID {map-ac equipmentMngt(13) version3(3)} }
 
-interVlrInfoRetrievalContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac interVlrInfoRetrieval(15) version3(3)}
+equipmentMngtContext-v2 APPLICATION-CONTEXT ::= {
+    -- Responder is EIR if Initiator is MSC
+    -- Responder is EIR if Initiator is SGSN
+    INITIATOR CONSUMER OF {
+    equipmentMngtPackage-v2}
+ ID {map-ac equipmentMngt(13) version2(2)} }
 
-subscriberDataMngtContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac subscriberDataMngt(16) version3(3)}
+infoRetrievalContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is VLR
+    -- Responder is HLR if Initiator is SGSN
+    INITIATOR CONSUMER OF {
+    infoRetrievalPackage-v3}
+ ID {map-ac infoRetrieval(14) version3(3)} }
 
-tracingContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac tracing(17) version3(3)}
+infoRetrievalContext-v2 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is VLR
+    -- Responder is HLR if Initiator is SGSN
+    INITIATOR CONSUMER OF {
+    infoRetrievalPackage-v2}
+ ID {map-ac infoRetrieval(14) version2(2)} }
 
-networkFunctionalSsContext-v2  OBJECT IDENTIFIER ::=
-	{map-ac networkFunctionalSs(18) version2(2)}
+interVlrInfoRetrievalContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VLR if Initiator is VLR
+    INITIATOR CONSUMER OF {
+    interVlrInfoRetrievalPackage-v3}
+ ID {map-ac interVlrInfoRetrieval(15) version3(3)} }
 
-networkUnstructuredSsContext-v2  OBJECT IDENTIFIER ::=
-	{map-ac networkUnstructuredSs(19) version2(2)}
+interVlrInfoRetrievalContext-v2 APPLICATION-CONTEXT ::= {
+    -- Responder is VLR if Initiator is VLR
+    INITIATOR CONSUMER OF {
+    interVlrInfoRetrievalPackage-v2}
+ ID {map-ac interVlrInfoRetrieval(15) version2(2)} }
 
-shortMsgGatewayContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac shortMsgGateway(20) version3(3)}
+subscriberDataMngtContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VLR or SGSN if Initiator is HLR or CSS
+    INITIATOR CONSUMER OF {
+    subscriberDataMngtStandAlonePackage-v3}
+ ID {map-ac subscriberDataMngt(16) version3(3)} }
 
-shortMsgMO-RelayContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac shortMsgMO-Relay(21) version3(3)}
+tracingContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VLR or SGSN if Initiator is HLR
+    INITIATOR CONSUMER OF {
+    tracingStandAlonePackage-v3}
+ ID {map-ac tracing(17) version3(3)} }
 
-shortMsgAlertContext-v2  OBJECT IDENTIFIER ::=
-	{map-ac shortMsgAlert(23) version2(2)}
+networkFunctionalSsContext-v2 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR, Initiator is VLR
+    INITIATOR CONSUMER OF {
+    functionalSsPackage-v2}
+ ID {map-ac networkFunctionalSs(18) version2(2)} }
 
-mwdMngtContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac mwdMngt(24) version3(3)}
+networkFunctionalSsContext-v1 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR, Initiator is VLR
+    INITIATOR CONSUMER OF {
+    functionalSsPackage-v1 |
+    unstructuredSsPackage-v1 |
+    bindingPackage-v1}
+ ID {map-ac networkFunctionalSs(18) version1(1)} }
 
-shortMsgMT-RelayContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac shortMsgMT-Relay(25) version3(3)}
+networkUnstructuredSsContext-v2 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR, Initiator is VLR
+    -- Responder is VLR, Initiator is HLR
+    -- Responder is gsmSCF, Initiator is HLR
+    -- Responder is HLR, Initiator is gsmSCF
+    -- Responder is HLR, Initiator is HLR
+    OPERATIONS OF {
+    unstructuredSsPackage-v2}
+ ID {map-ac networkUnstructuredSs(19) version2(2)} }
 
-shortMsgMT-Relay-VGCS-Context-v3  OBJECT IDENTIFIER ::=
-	{map-ac shortMsgMT-Relay-VGCS(41) version3(3)}
+shortMsgGatewayContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is GMSC
+    INITIATOR CONSUMER OF {
+    shortMsgGatewayPackage-v3}
+ ID {map-ac shortMsgGateway(20) version3(3)} }
 
-imsiRetrievalContext-v2  OBJECT IDENTIFIER ::=
-	{map-ac imsiRetrieval(26) version2(2)}
+shortMsgMO-RelayContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is IWMSC if Initiator is MSC
+    -- Responder is IWMSC if Initiator is SGSN
+    INITIATOR CONSUMER OF {
+    mo-ShortMsgRelayPackage-v3}
+ ID {map-ac shortMsgMO-Relay(21) version3(3)} }
 
-msPurgingContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac msPurging(27) version3(3)}
+shortMsgAlertContext-v2 APPLICATION-CONTEXT ::= {
+    -- Responder is IWMSC if Initiator is HLR
+    INITIATOR CONSUMER OF {
+    alertingPackage-v2}
+ ID {map-ac shortMsgAlert(23) version2(2)} }
 
-subscriberInfoEnquiryContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac subscriberInfoEnquiry(28) version3(3)}
+mwdMngtContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is SGSN
+    -- Responder is HLR if Initiator is VLR
+    INITIATOR CONSUMER OF {
+    mwdMngtPackage-v3}
+ ID {map-ac mwdMngt(24) version3(3)} }
 
-anyTimeInfoEnquiryContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac anyTimeInfoEnquiry(29) version3(3)}
+shortMsgMT-RelayContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is MSC or SGSN if Initiator is GMSC
+    INITIATOR CONSUMER OF {
+    mt-ShortMsgRelayPackage-v3}
+ ID {map-ac shortMsgMT-Relay(25) version3(3)} }
 
-callControlTransferContext-v4  OBJECT IDENTIFIER ::=
-	{map-ac callControlTransfer(6) version4(4)}
+msPurgingContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is VLR
+    -- Responder is HLR if Initiator is SGSN
+    INITIATOR CONSUMER OF {
+    purgingPackage-v3}
+ ID {map-ac msPurging(27) version3(3)} }
 
-ss-InvocationNotificationContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac ss-InvocationNotification(36) version3(3)}
+subscriberInfoEnquiryContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VLR or SGSN if Initiator is HLR
+    INITIATOR CONSUMER OF {
+    subscriberInformationEnquiryPackage-v3}
+ ID {map-ac subscriberInfoEnquiry(28) version3(3)} }
 
-groupCallControlContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac groupCallControl(31) version3(3)}
+anyTimeInfoEnquiryContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR or GMLC or NPLR if Initiator is gsmSCF
+    INITIATOR CONSUMER OF {
+    anyTimeInformationEnquiryPackage-v3}
+ ID {map-ac anyTimeInfoEnquiry(29) version3(3)} }
 
-groupCallInfoRetrievalContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac groupCallInfoRetrieval(45) version3(3)}
+groupCallControlContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is relay MSC if Initiator is anchor MSC
+    INITIATOR CONSUMER OF {
+    groupCallControlPackage-v3}
+ ID {map-ac groupCallControl(31) version3(3)} }
 
-gprsLocationUpdateContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac gprsLocationUpdate(32) version3(3)}
+groupCallInfoRetControlContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is group call serving MSC if Initiator is visited MSC
+    -- Responder is visited MSC if Initiator is group call serving MSC
+    INITIATOR CONSUMER OF {
+    groupCallInfoRetrievalPackage-v3}
+ ID {map-ac groupCallInfoRetrieval(45) version3(3)} }
 
-gprsLocationInfoRetrievalContext-v4  OBJECT IDENTIFIER ::=
-	{map-ac gprsLocationInfoRetrieval(33) version4(4)}
+gprsLocationUpdateContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is SGSN
+    INITIATOR CONSUMER OF {
+    gprsLocationUpdatingPackage-v3}
+    RESPONDER CONSUMER OF {
+    subscriberDataMngtPackage-v3 |
+    tracingPackage-v3}
+ ID {map-ac gprsLocationUpdate(32) version3(3)} }
 
-failureReportContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac failureReport(34) version3(3)}
+gprsLocationInfoRetrievalContext-v4 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is GGSN
+    INITIATOR CONSUMER OF {
+    gprsInterrogationPackage-v4}
+ ID {map-ac gprsLocationInfoRetrieval(33) version4(4)} }
 
-gprsNotifyContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac gprsNotify(35) version3(3)}
+failureReportContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is GGSN
+    INITIATOR CONSUMER OF {
+    failureReportingPackage-v3}
+ ID {map-ac failureReport(34) version3(3)} }
 
-reportingContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac reporting(7) version3(3)}
+gprsNotifyContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is GGSN if Initiator is HLR
+    INITIATOR CONSUMER OF {
+    gprsNotifyingPackage-v3}
+ ID {map-ac gprsNotify(35) version3(3)} }
 
-callCompletionContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac callCompletion(8) version3(3)}
+ss-InvocationNotificationContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is gsmSCF, Initiator is MSC
+    -- Responder is gsmSCF, Initiator is HLR
+    INITIATOR CONSUMER OF {
+    ss-InvocationNotificationPackage-v3}
+ ID {map-ac ss-InvocationNotification(36) version3(3)} }
 
-istAlertingContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac istAlerting(4) version3(3)}
+reportingContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VLR if Initiator is HLR
+    -- Responder is HLR if Initiator is VLR
+    INITIATOR CONSUMER OF {
+    setReportingStatePackage-v3 |
+    statusReportPackage-v3 |
+    remoteUserFreePackage-v3}
+    RESPONDER CONSUMER OF {
+    setReportingStatePackage-v3 |
+    statusReportPackage-v3}
+ ID {map-ac reporting(7) version3(3)} }
 
-serviceTerminationContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac immediateTermination(9) version3(3)}
+callCompletionContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is VLR
+    INITIATOR CONSUMER OF {
+    callCompletionPackage-v3}
+ ID {map-ac callCompletion(8) version3(3)} }
 
-locationSvcGatewayContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac locationSvcGateway(37) version3(3)}
+locationSvcGatewayContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is GMLC
+    INITIATOR CONSUMER OF {
+    locationSvcGatewayPackage-v3}
+ ID {map-ac locationSvcGateway(37) version3(3)} }
 
-locationSvcEnquiryContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac locationSvcEnquiry(38) version3(3)}
+locationSvcEnquiryContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is MSC or SGSN if Initiator is GMLC
+    -- Responder is GMLC if Initiator is MSC
+    -- Responder is GMLC if Initiator is SGSN
+    INITIATOR CONSUMER OF {
+    locationSvcEnquiryPackage-v3 |
+    locationSvcReportingPackage-v3}
+ ID {map-ac locationSvcEnquiry(38) version3 (3)} }
 
-mm-EventReportingContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac mm-EventReporting(42) version3(3)}
+istAlertingContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is VMSC
+    -- Responder is HLR if Initiator is GMSC
+    INITIATOR CONSUMER OF {
+    ist-AlertingPackage-v3}
+ ID {map-ac alerting(4) version3(3)} }
 
-anyTimeInfoHandlingContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac anyTimeInfoHandling(43) version3(3)}
+serviceTerminationContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VMSC or GMSC if Initiator is HLR
+    INITIATOR CONSUMER OF {
+    serviceTerminationPackage-v3}
+ ID {map-ac serviceTermination(9) version3(3)} }
 
-subscriberDataModificationNotificationContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac subscriberDataModificationNotification(22) version3(3)}
+mm-EventReportingContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is gsmSCF, Initiator is VLR
+    INITIATOR CONSUMER OF {
+    mm-EventReportingPackage-v3}
+ ID {map-ac mm-EventReporting(42) version3(3)} }
 
-resourceManagementContext-v3  OBJECT IDENTIFIER ::=
-	{map-ac resourceManagement(44) version3(3)}
+anyTimeInfohandlingContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is gsmSCF
+    INITIATOR CONSUMER OF {
+    anyTimeInformationHandlingPackage-v3}
+ ID {map-ac anyTimeInfoHandling(43) version3(3)} }
 
--- The following Object Identifiers are reserved for application-contexts
---  existing in previous versions of the protocol
+subscriberDataModificationNotificationContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is gsmSCF, Initiator is HLR
+    INITIATOR CONSUMER OF {
+    subscriberDataModificationNotificationPackage-v3}
+ ID {map-ac subscriberDataModificationNotification(22) version3(3)} }
 
--- AC Name & Version	Object Identifier
--- 
--- networkLocUpContext-v1	map-ac networkLocUp (1)	version1 (1)
--- networkLocUpContext-v2	map-ac networkLocUp (1)	version2 (2)
--- locationCancellationContext-v1	map-ac locationCancellation (2)	version1 (1)
--- locationCancellationContext-v2	map-ac locationCancellation (2)	version2 (2)
--- roamingNumberEnquiryContext-v1	map-ac roamingNumberEnquiry (3)	version1 (1)
--- roamingNumberEnquiryContext-v2	map-ac roamingNumberEnquiry (3)	version2 (2)
--- locationInfoRetrievalContext-v1	map-ac locationInfoRetrieval (5)	version1 (1)
--- locationInfoRetrievalContext-v2	map-ac locationInfoRetrieval (5)	version2 (2)
--- resetContext-v1	map-ac reset (10)	version1 (1)
--- handoverControlContext-v1	map-ac handoverControl (11)	version1 (1)
--- handoverControlContext-v2	map-ac handoverControl (11)	version2 (2)
--- sIWFSAllocationContext-v3	map-ac sIWFSAllocation (12)	version3 (3)
--- equipmentMngtContext-v1	map-ac equipmentMngt (13)	version1 (1)
--- equipmentMngtContext-v2	map-ac equipmentMngt (13)	version2 (2)
--- infoRetrievalContext-v1	map-ac infoRetrieval (14)	version1 (1) 
--- infoRetrievalContext-v2	map-ac infoRetrieval (14)	version2 (2)
--- interVlrInfoRetrievalContext-v2	map-ac interVlrInfoRetrieval (15)	version2 (2)
--- subscriberDataMngtContext-v1	map-ac subscriberDataMngt (16)	version1 (1)
--- subscriberDataMngtContext-v2	map-ac subscriberDataMngt (16)	version2 (2)
--- tracingContext-v1	map-ac tracing (17)	version1 (1)
--- tracingContext-v2	map-ac tracing (17)	version2 (2)
--- networkFunctionalSsContext-v1	map-ac networkFunctionalSs (18)	version1 (1)
--- shortMsgGatewayContext-v1	map-ac shortMsgGateway (20)	version1 (1)
--- shortMsgGatewayContext-v2	map-ac shortMsgGateway (20)	version2 (2)
--- shortMsgRelayContext-v1	map-ac shortMsgRelay (21)	version1 (1)
--- shortMsgAlertContext-v1	map-ac shortMsgAlert (23)	version1 (1)
--- mwdMngtContext-v1	map-ac mwdMngt (24)	version1 (1)
--- mwdMngtContext-v2	map-ac mwdMngt (24)	version2 (2)
--- shortMsgMT-RelayContext-v2	map-ac shortMsgMT-Relay (25)	version2 (2)
--- msPurgingContext-v2	map-ac msPurging (27)	version2 (2) 
--- callControlTransferContext-v3	map-ac callControlTransferContext (6)	version3 (3) 
--- gprsLocationInfoRetrievalContext-v3	map-ac gprsLocationInfoRetrievalContext (33) version3 (3)
+authenticationFailureReportContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is HLR if Initiator is VLR
+    -- Responder is HLR if Initiator is SGSN
+    INITIATOR CONSUMER OF {
+    authenticationFailureReportPackage-v3 }
+ ID {map-ac authenticationFailureReport(39) version3(3)} }
 
+resourceManagementContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VMSC if Initiator is GMSC
+    INITIATOR CONSUMER OF {
+    resourceManagementPackage-v3 }
+ ID {map-ac resourceManagement(44) version3(3)} }
+
+shortMsgMT-Relay-VGCS-Context-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is MSC if Initiator is SMS-GMSC
+    INITIATOR CONSUMER OF {
+    mt-ShortMsgRelay-VGCS-Package-v3}
+ ID {map-ac shortMsgMT-Relay-VGCS(41) version3(3)} }
+
+vcsgLocationUpdateContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is CSS if Initiator is VLR or SGSN
+    INITIATOR CONSUMER OF {
+    vcsgLocationUpdatingPackage-v3}
+    RESPONDER CONSUMER OF {
+    subscriberDataMngtPackage-v3}
+ ID {map-ac vcsgLocationUpdate(46) version3(3)} }
+
+vcsgLocationCancellationContext-v3 APPLICATION-CONTEXT ::= {
+    -- Responder is VLR or SGSN if Initiator is CSS
+    INITIATOR CONSUMER OF {
+    vcsgLocationCancellationPackage-v3}
+ ID {map-ac vcsgLocationCancel(47) version3(3)} }
 
 END

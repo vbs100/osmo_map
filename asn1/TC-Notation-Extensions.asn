@@ -25,25 +25,15 @@ IMPORTS
       version1(1)};
 
 APPLICATION-CONTEXT ::= CLASS {
-  &associationContract           CONTRACT,
-  &dialogueMode                  DialogueMode,
-  &termination                   Termination OPTIONAL,
-  &componentGrouping             BOOLEAN DEFAULT TRUE,
-  &dialogueAndComponentGrouping  BOOLEAN DEFAULT TRUE,
-  &AdditionalASEs                OBJECT IDENTIFIER OPTIONAL,
-  &AbstractSyntaxes              ABSTRACT-SYNTAX,
-  &applicationContextName        OBJECT IDENTIFIER UNIQUE
-}
+   &Symmetric OPERATION-PACKAGE OPTIONAL,
+   &InitiatorConsumerOf OPERATION-PACKAGE OPTIONAL,
+   &ResponderConsumerOf OPERATION-PACKAGE OPTIONAL,
+   &code OBJECT IDENTIFIER }
 WITH SYNTAX {
-  CONTRACT &associationContract
-  DIALOGUE MODE &dialogueMode
-  [TERMINATION &termination]
-  [COMPONENT GROUPING ALLOWED &componentGrouping]
-  [DIALOGUE WITH COMPONENTS ALLOWED &dialogueAndComponentGrouping]
-  [ADDITIONAL ASES &AdditionalASEs]
-  ABSTRACT SYNTAXES &AbstractSyntaxes
-  APPLICATION CONTEXT NAME &applicationContextName
-}
+   [ OPERATIONS OF &Symmetric ]
+   [ INITIATOR CONSUMER OF &InitiatorConsumerOf ]
+   [ RESPONDER CONSUMER OF &ResponderConsumerOf ]
+     ID &code }
 
 DialogueMode ::= ENUMERATED {structured(1), unstructured(2)}
 
